@@ -99,6 +99,21 @@ const TalentSubmission = () => {
           )}
         </div>
 
+        <div className="mb-6">
+          <Label>Legal Agreement</Label>
+          <div className="bg-gray-100 p-4 rounded-md text-sm mb-4">
+            <p>By signing below, I acknowledge and agree to the following:</p>
+            <ol className="list-decimal pl-5 mt-2 space-y-2">
+              <li>I grant ScoutWired the right to use my submitted content for promotional purposes.</li>
+              <li>I confirm that I have all necessary rights to the content I'm submitting.</li>
+              <li>I understand that my personal information will be handled in accordance with ScoutWired's privacy policy.</li>
+              <li>I agree to abide by ScoutWired's terms of service and community guidelines.</li>
+              {isUnder18 && (
+                <li>As the parent/guardian of the participant, I give permission for their participation and agree to the terms on their behalf.</li>
+              )}
+            </ol>
+          </div>
+        </div>
         <div>
           <Label>{isUnder18 ? "Parent/Guardian E-Signature" : "E-Signature"}</Label>
           <SignatureCanvas 
