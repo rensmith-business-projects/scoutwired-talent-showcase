@@ -46,19 +46,21 @@ const TalentSubmission = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6">Submit Your Talent</h2>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Submit Your Talent</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div>
-          <Label htmlFor="name">Full Name</Label>
-          <Input id="name" {...register("name", { required: "Name is required" })} />
-          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <Label htmlFor="name">Full Name</Label>
+            <Input id="name" {...register("name", { required: "Name is required" })} />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+          </div>
 
-        <div>
-          <Label htmlFor="discordUsername">Discord Username</Label>
-          <Input id="discordUsername" {...register("discordUsername", { required: "Discord Username is required" })} />
-          {errors.discordUsername && <p className="text-red-500">{errors.discordUsername.message}</p>}
+          <div>
+            <Label htmlFor="discordUsername">Discord Username</Label>
+            <Input id="discordUsername" {...register("discordUsername", { required: "Discord Username is required" })} />
+            {errors.discordUsername && <p className="text-red-500 text-sm mt-1">{errors.discordUsername.message}</p>}
+          </div>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -67,7 +69,7 @@ const TalentSubmission = () => {
         </div>
 
         {isUnder18 && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
             <p className="font-bold">Important Notice</p>
             <p>As you are under 18, you must obtain a parent or guardian's signature for your submission.</p>
           </div>
@@ -75,8 +77,8 @@ const TalentSubmission = () => {
 
         <div>
           <Label htmlFor="talentDescription">Describe Your Talent</Label>
-          <Textarea id="talentDescription" {...register("talentDescription", { required: "Description is required" })} />
-          {errors.talentDescription && <p className="text-red-500">{errors.talentDescription.message}</p>}
+          <Textarea id="talentDescription" {...register("talentDescription", { required: "Description is required" })} className="h-32" />
+          {errors.talentDescription && <p className="text-red-500 text-sm mt-1">{errors.talentDescription.message}</p>}
         </div>
 
         <div>
@@ -92,7 +94,7 @@ const TalentSubmission = () => {
           {videoPreviewUrl && (
             <div className="mt-4">
               <Label>Video Preview</Label>
-              <video src={videoPreviewUrl} controls className="w-full mt-2" />
+              <video src={videoPreviewUrl} controls className="w-full mt-2 max-h-64 object-contain" />
             </div>
           )}
         </div>
@@ -101,12 +103,12 @@ const TalentSubmission = () => {
           <Label>{isUnder18 ? "Parent/Guardian E-Signature" : "E-Signature"}</Label>
           <SignatureCanvas 
             penColor='black'
-            canvasProps={{width: 500, height: 200, className: 'border border-gray-300'}}
+            canvasProps={{width: '100%', height: 200, className: 'border border-gray-300 rounded-md w-full'}}
             onEnd={() => setSignature(true)}
           />
         </div>
 
-        <Button type="submit" disabled={mutation.isPending || !signature || !videoFile}>
+        <Button type="submit" disabled={mutation.isPending || !signature || !videoFile} className="w-full">
           {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
         </Button>
       </form>
