@@ -4,6 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ViewSubmissions = () => {
+  const [submissions] = useState([
+    {
+      name: "John Doe",
+      talentDescription: "Singing",
+      discordUsername: "johndoe#1234",
+      videoUrl: "https://example.com/video1.mp4"
+    },
+    {
+      name: "Jane Smith",
+      talentDescription: "Dancing",
+      discordUsername: "janesmith#5678",
+      videoUrl: "https://example.com/video2.mp4"
+    }
+  ]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const correctPassword = 'scoutwired123'; // In a real app, this would be handled securely on the server
@@ -42,18 +56,18 @@ const ViewSubmissions = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Talent Submissions</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* This is where you would map through your submissions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>John Doe</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Talent: Singing</p>
-            <p>Email: john@example.com</p>
-            {/* Add more details as needed */}
-          </CardContent>
-        </Card>
-        {/* Add more submission cards here */}
+        {submissions.map((submission, index) => (
+          <Card key={index}>
+            <CardHeader>
+              <CardTitle>{submission.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Talent: {submission.talentDescription}</p>
+              <p>Discord Username: {submission.discordUsername}</p>
+              <video src={submission.videoUrl} controls className="w-full mt-2" />
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

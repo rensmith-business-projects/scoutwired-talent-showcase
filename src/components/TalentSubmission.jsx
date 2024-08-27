@@ -11,6 +11,7 @@ const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
+const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const isUnder18 = watch("isUnder18");
 
   const onSubmit = (data) => {
@@ -30,9 +31,9 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" {...register("email", { required: "Email is required" })} />
-          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+          <Label htmlFor="discordUsername">Discord Username</Label>
+          <Input id="discordUsername" {...register("discordUsername", { required: "Discord Username is required" })} />
+          {errors.discordUsername && <p className="text-red-500">{errors.discordUsername.message}</p>}
         </div>
 
         <div className="flex items-center space-x-2">
@@ -55,7 +56,20 @@ const TalentSubmission = () => {
 
         <div>
           <Label htmlFor="video">Upload Your Video</Label>
-          <Input id="video" type="file" accept="video/*" onChange={(e) => setVideoFile(e.target.files[0])} required />
+          <Input id="video" type="file" accept="video/*" onChange={(e) => {
+            const file = e.target.files[0];
+            setVideoFile(file);
+            if (file) {
+              const videoUrl = URL.createObjectURL(file);
+              setVideoPreviewUrl(videoUrl);
+            }
+          }} required />
+          {videoPreviewUrl && (
+            <div className="mt-4">
+              <Label>Video Preview</Label>
+              <video src={videoPreviewUrl} controls className="w-full mt-2" />
+            </div>
+          )}
         </div>
 
         <div>
