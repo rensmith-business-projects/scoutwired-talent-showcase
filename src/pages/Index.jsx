@@ -8,9 +8,14 @@ const Index = () => {
       <div className="text-center text-white">
         <h1 className="text-6xl font-bold mb-4">Scoutwired's Got Talent</h1>
         <p className="text-2xl mb-8">Show off your skills and become the next big star!</p>
-        <Button asChild className="bg-white text-purple-600 hover:bg-gray-100">
-          <Link to="/submit">Submit Your Talent</Link>
-        </Button>
+        <div className="space-x-4">
+          <Button asChild className="bg-white text-purple-600 hover:bg-gray-100">
+            <Link to="/submit">Submit Your Talent</Link>
+          </Button>
+          <Button asChild className="bg-purple-600 text-white hover:bg-purple-700">
+            <Link to="/submissions">View Submissions</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );
