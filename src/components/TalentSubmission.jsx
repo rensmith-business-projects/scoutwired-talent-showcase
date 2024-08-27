@@ -1,23 +1,48 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import SignatureCanvas from 'react-signature-canvas';
+import { submitTalent } from '@/lib/api';
+import { useToast } from "@/components/ui/use-toast";
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
-const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const isUnder18 = watch("isUnder18");
+  const { toast } = useToast();
 
-  const onSubmit = (data) => {
-    console.log(data, signature, videoFile);
-    // Here you would typically send this data to your backend
-    alert('Submission received! Thank you for participating.');
+  const mutation = useMutation({
+    mutationFn: submitTalent,
+    onSuccess: () => {
+      toast({
+        title: "Submission Successful",
+        description: "Thank you for participating!",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Submission Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = async (data) => {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    formData.append('signature', signature);
+    formData.append('video', videoFile);
+    mutation.mutate(formData);
   };
 
   return (
@@ -81,7 +106,9 @@ const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
           />
         </div>
 
-        <Button type="submit" disabled={!signature || !videoFile}>Submit Your Talent</Button>
+        <Button type="submit" disabled={mutation.isPending || !signature || !videoFile}>
+          {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
+        </Button>
       </form>
     </div>
   );

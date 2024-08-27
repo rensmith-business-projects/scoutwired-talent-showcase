@@ -1,26 +1,20 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSubmissions } from '@/lib/api';
 
 const ViewSubmissions = () => {
-  const [submissions] = useState([
-    {
-      name: "John Doe",
-      talentDescription: "Singing",
-      discordUsername: "johndoe#1234",
-      videoUrl: "https://example.com/video1.mp4"
-    },
-    {
-      name: "Jane Smith",
-      talentDescription: "Dancing",
-      discordUsername: "janesmith#5678",
-      videoUrl: "https://example.com/video2.mp4"
-    }
-  ]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const correctPassword = 'scoutwired123'; // In a real app, this would be handled securely on the server
+
+  const { data: submissions, isLoading, error } = useQuery({
+    queryKey: ['submissions'],
+    queryFn: getSubmissions,
+    enabled: isAuthenticated,
+  });
 
   const handleLogin = () => {
     if (password === correctPassword) {
@@ -51,6 +45,9 @@ const ViewSubmissions = () => {
       </div>
     );
   }
+
+  if (isLoading) return <div>Loading submissions...</div>;
+  if (error) return <div>Error loading submissions: {error.message}</div>;
 
   return (
     <div className="container mx-auto p-4">
