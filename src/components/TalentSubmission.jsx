@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import SignatureCanvas from 'react-signature-canvas';
 
 const TalentSubmission = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
+  const isUnder18 = watch("isUnder18");
 
   const onSubmit = (data) => {
     console.log(data, signature, videoFile);
@@ -33,6 +35,18 @@ const TalentSubmission = () => {
           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
         </div>
 
+        <div className="flex items-center space-x-2">
+          <Checkbox id="isUnder18" {...register("isUnder18")} />
+          <Label htmlFor="isUnder18">I am under 18 years old</Label>
+        </div>
+
+        {isUnder18 && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+            <p className="font-bold">Important Notice</p>
+            <p>As you are under 18, you must obtain a parent or guardian's signature for your submission.</p>
+          </div>
+        )}
+
         <div>
           <Label htmlFor="talentDescription">Describe Your Talent</Label>
           <Textarea id="talentDescription" {...register("talentDescription", { required: "Description is required" })} />
@@ -45,7 +59,7 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label>E-Signature</Label>
+          <Label>{isUnder18 ? "Parent/Guardian E-Signature" : "E-Signature"}</Label>
           <SignatureCanvas 
             penColor='black'
             canvasProps={{width: 500, height: 200, className: 'border border-gray-300'}}
