@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,14 +18,12 @@ const TalentSubmission = () => {
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: submitTalent,
     onSuccess: () => {
-      toast({
-        title: "Submission Successful",
-        description: "Thank you for participating!",
-      });
+      navigate('/success');
     },
     onError: (error) => {
       toast({
