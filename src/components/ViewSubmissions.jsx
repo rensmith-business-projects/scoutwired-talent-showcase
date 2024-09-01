@@ -8,33 +8,38 @@ import { loginRequest } from '@/lib/samlAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const ViewSubmissions = () => {
-  const { instance } = useMsal();
+  const { instance, accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    setIsLoading(false);
-    if (isAuthenticated && location.pathname === '/auth-redirect') {
-      navigate('/submissions');
-    }
-  }, [isAuthenticated, location, navigate]);
+    const checkAndSetAuth = async () => {
+      setIsLoading(true);
+      if (!isAuthenticated && accounts.length === 0) {
+        // No authenticated user, initiate login
+        try {
+          await instance.loginRedirect(loginRequest);
+        } catch (error) {
+          console.error('Login failed:', error);
+          setIsLoading(false);
+        }
+      } else if (isAuthenticated && location.pathname === '/auth-redirect') {
+        navigate('/submissions');
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    checkAndSetAuth();
+  }, [isAuthenticated, accounts, instance, location, navigate]);
 
   const { data: submissions, isLoading: isLoadingSubmissions, error } = useQuery({
     queryKey: ['submissions'],
     queryFn: getSubmissions,
     enabled: isAuthenticated,
   });
-
-  const handleLogin = async () => {
-    try {
-      await instance.loginRedirect(loginRequest);
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
-    }
-  };
 
   const handleLogout = async () => {
     try {
@@ -54,10 +59,10 @@ const ViewSubmissions = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <Card className="w-[90%] max-w-[350px]">
           <CardHeader>
-            <CardTitle className="text-center">MS365 Authentication Required</CardTitle>
+            <CardTitle className="text-center">Authentication Required</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleLogin} className="w-full">Login with Microsoft 365</Button>
+            <p className="text-center mb-4">Please wait while we redirect you to login...</p>
           </CardContent>
         </Card>
       </div>
