@@ -1,31 +1,34 @@
-// Mock API functions for frontend development
+const API_URL = 'http://localhost:3001/api';
 
 export const submitTalent = async (formData) => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Simulate successful submission
-  if (Math.random() > 0.1) { // 90% success rate
-    return { success: true, message: "Talent submitted successfully" };
-  } else {
+  try {
+    const response = await fetch(`${API_URL}/submissions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to submit talent');
+    }
+    const data = await response.json();
+    return { success: true, message: "Talent submitted successfully", data };
+  } catch (error) {
+    console.error('Error submitting talent:', error);
     throw new Error("Failed to submit talent. Please try again.");
   }
 };
 
 export const getSubmissions = async () => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Simulate fetching submissions
-  const mockSubmissions = [
-    { id: 1, name: "John Doe", talentDescription: "Juggling", discordUsername: "johnd#1234", videoUrl: "https://example.com/video1.mp4" },
-    { id: 2, name: "Jane Smith", talentDescription: "Singing", discordUsername: "janes#5678", videoUrl: "https://example.com/video2.mp4" },
-    { id: 3, name: "Alex Johnson", talentDescription: "Magic Tricks", discordUsername: "alexj#9012", videoUrl: "https://example.com/video3.mp4" },
-  ];
-
-  if (Math.random() > 0.1) { // 90% success rate
-    return mockSubmissions;
-  } else {
+  try {
+    const response = await fetch(`${API_URL}/submissions`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch submissions');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching submissions:', error);
     throw new Error("Failed to fetch submissions. Please try again.");
   }
 };
