@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { navItems } from "./nav-items";
 import { MsalProvider } from "@azure/msal-react";
 import { msalInstance } from "./lib/samlAuth";
+import ViewSubmissions from "./components/ViewSubmissions";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
             {navItems.map(({ to, page }) => (
               <Route key={to} path={to} element={page} />
             ))}
+            <Route path="/auth-redirect" element={<ViewSubmissions />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

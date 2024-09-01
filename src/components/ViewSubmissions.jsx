@@ -5,15 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSubmissions } from '@/lib/api';
 import { useMsal, useIsAuthenticated } from "@azure/msal-react";
 import { loginRequest } from '@/lib/samlAuth';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const ViewSubmissions = () => {
   const { instance } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     setIsLoading(false);
-  }, [isAuthenticated]);
+    if (isAuthenticated && location.pathname === '/auth-redirect') {
+      navigate('/submissions');
+    }
+  }, [isAuthenticated, location, navigate]);
 
   const { data: submissions, isLoading: isLoadingSubmissions, error } = useQuery({
     queryKey: ['submissions'],
@@ -23,7 +29,7 @@ const ViewSubmissions = () => {
 
   const handleLogin = async () => {
     try {
-      await instance.loginPopup(loginRequest);
+      await instance.loginRedirect(loginRequest);
     } catch (error) {
       console.error('Login failed:', error);
       alert('Login failed. Please try again.');
@@ -32,7 +38,7 @@ const ViewSubmissions = () => {
 
   const handleLogout = async () => {
     try {
-      await instance.logoutPopup();
+      await instance.logoutRedirect();
     } catch (error) {
       console.error('Logout failed:', error);
       alert('Logout failed. Please try again.');
