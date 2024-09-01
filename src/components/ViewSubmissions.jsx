@@ -3,14 +3,20 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSubmissions } from '@/lib/api';
+import { useMsal } from "@azure/msal-react";
 import { initializeSAML, signInWithSAML, checkAuthStatus, signOut } from '@/lib/samlAuth';
 
 const ViewSubmissions = () => {
+  const { instance } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    initializeSAML();
-    checkAuthStatus().then(setIsAuthenticated);
+    const init = async () => {
+      await initializeSAML();
+      const authStatus = await checkAuthStatus();
+      setIsAuthenticated(authStatus);
+    };
+    init();
   }, []);
 
   const { data: submissions, isLoading, error } = useQuery({
@@ -44,10 +50,10 @@ const ViewSubmissions = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <Card className="w-[90%] max-w-[350px]">
           <CardHeader>
-            <CardTitle className="text-center">SAML Authentication Required</CardTitle>
+            <CardTitle className="text-center">MS365 Authentication Required</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleLogin} className="w-full">Login with SAML</Button>
+            <Button onClick={handleLogin} className="w-full">Login with Microsoft 365</Button>
           </CardContent>
         </Card>
       </div>
