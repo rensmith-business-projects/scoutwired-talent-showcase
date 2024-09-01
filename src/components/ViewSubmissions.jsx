@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSubmissions } from '@/lib/api';
+import { initializeSAML, signInWithSAML, checkAuthStatus, signOut } from '@/lib/samlAuth';
 
 const ViewSubmissions = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const correctPassword = 'scoutwired123'; // In a real app, this would be handled securely on the server
+
+  useEffect(() => {
+    initializeSAML();
+    checkAuthStatus().then(setIsAuthenticated);
+  }, []);
 
   const { data: submissions, isLoading, error } = useQuery({
     queryKey: ['submissions'],
@@ -16,11 +19,23 @@ const ViewSubmissions = () => {
     enabled: isAuthenticated,
   });
 
-  const handleLogin = () => {
-    if (password === correctPassword) {
+  const handleLogin = async () => {
+    try {
+      await signInWithSAML();
       setIsAuthenticated(true);
-    } else {
-      alert('Incorrect password');
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      alert('Logout failed. Please try again.');
     }
   };
 
@@ -29,17 +44,10 @@ const ViewSubmissions = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <Card className="w-[90%] max-w-[350px]">
           <CardHeader>
-            <CardTitle className="text-center">Enter Password</CardTitle>
+            <CardTitle className="text-center">SAML Authentication Required</CardTitle>
           </CardHeader>
           <CardContent>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              className="mb-4"
-            />
-            <Button onClick={handleLogin} className="w-full">Login</Button>
+            <Button onClick={handleLogin} className="w-full">Login with SAML</Button>
           </CardContent>
         </Card>
       </div>
@@ -51,7 +59,10 @@ const ViewSubmissions = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Talent Submissions</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold">Talent Submissions</h1>
+        <Button onClick={handleLogout}>Logout</Button>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {submissions.map((submission, index) => (
           <Card key={index} className="flex flex-col">
