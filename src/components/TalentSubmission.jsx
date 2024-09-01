@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,7 @@ const TalentSubmission = () => {
   const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const signatureRef = useRef();
 
   const mutation = useMutation({
     mutationFn: submitTalent,
@@ -43,6 +44,15 @@ const TalentSubmission = () => {
   });
 
   const onSubmit = async (data) => {
+    if (signatureRef.current.isEmpty()) {
+      toast({
+        title: "Signature Required",
+        description: "Please provide your signature before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const formData = new FormData();
     for (const key in data) {
       formData.append(key, data[key]);
@@ -56,6 +66,11 @@ const TalentSubmission = () => {
     if (checked) {
       setIsUnder18DialogOpen(true);
     }
+  };
+
+  const clearSignature = () => {
+    signatureRef.current.clear();
+    setSignature(null);
   };
 
   return (
@@ -126,14 +141,20 @@ const TalentSubmission = () => {
         </div>
         <div>
           <Label>{isUnder18 ? "Parent/Guardian E-Signature" : "E-Signature"}</Label>
-          <SignatureCanvas 
-            penColor='black'
-            canvasProps={{width: '100%', height: 200, className: 'border border-gray-300 rounded-md w-full'}}
-            onEnd={() => setSignature(true)}
-          />
+          <div className="border border-gray-300 rounded-md p-2">
+            <SignatureCanvas 
+              ref={signatureRef}
+              penColor='black'
+              canvasProps={{width: '100%', height: 200, className: 'signature-canvas'}}
+              onEnd={() => setSignature(signatureRef.current.toDataURL())}
+            />
+          </div>
+          <div className="mt-2">
+            <Button type="button" onClick={clearSignature} variant="outline">Clear Signature</Button>
+          </div>
         </div>
 
-        <Button type="submit" disabled={mutation.isPending || !signature || !videoFile} className="w-full">
+        <Button type="submit" disabled={mutation.isPending || !videoFile} className="w-full">
           {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
         </Button>
       </form>
