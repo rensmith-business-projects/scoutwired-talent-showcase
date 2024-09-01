@@ -3,23 +3,19 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSubmissions } from '@/lib/api';
-import { useMsal } from "@azure/msal-react";
-import { initializeSAML, signInWithSAML, checkAuthStatus, signOut } from '@/lib/samlAuth';
+import { useMsal, useIsAuthenticated } from "@azure/msal-react";
+import { loginRequest } from '@/lib/samlAuth';
 
 const ViewSubmissions = () => {
   const { instance } = useMsal();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const isAuthenticated = useIsAuthenticated();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const init = async () => {
-      await initializeSAML();
-      const authStatus = await checkAuthStatus();
-      setIsAuthenticated(authStatus);
-    };
-    init();
-  }, []);
+    setIsLoading(false);
+  }, [isAuthenticated]);
 
-  const { data: submissions, isLoading, error } = useQuery({
+  const { data: submissions, isLoading: isLoadingSubmissions, error } = useQuery({
     queryKey: ['submissions'],
     queryFn: getSubmissions,
     enabled: isAuthenticated,
@@ -27,8 +23,7 @@ const ViewSubmissions = () => {
 
   const handleLogin = async () => {
     try {
-      await signInWithSAML();
-      setIsAuthenticated(true);
+      await instance.loginPopup(loginRequest);
     } catch (error) {
       console.error('Login failed:', error);
       alert('Login failed. Please try again.');
@@ -37,13 +32,16 @@ const ViewSubmissions = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut();
-      setIsAuthenticated(false);
+      await instance.logoutPopup();
     } catch (error) {
       console.error('Logout failed:', error);
       alert('Logout failed. Please try again.');
     }
   };
+
+  if (isLoading) {
+    return <div className="text-center p-4">Checking authentication status...</div>;
+  }
 
   if (!isAuthenticated) {
     return (
@@ -60,7 +58,7 @@ const ViewSubmissions = () => {
     );
   }
 
-  if (isLoading) return <div className="text-center p-4">Loading submissions...</div>;
+  if (isLoadingSubmissions) return <div className="text-center p-4">Loading submissions...</div>;
   if (error) return <div className="text-center p-4 text-red-500">Error loading submissions: {error.message}</div>;
 
   return (
@@ -70,7 +68,7 @@ const ViewSubmissions = () => {
         <Button onClick={handleLogout}>Logout</Button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {submissions.map((submission) => (
+        {submissions && submissions.map((submission) => (
           <Card key={submission.id} className="flex flex-col">
             <CardHeader>
               <CardTitle className="text-xl">{submission.name}</CardTitle>
