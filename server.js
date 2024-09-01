@@ -10,8 +10,8 @@ app.use(express.json());
 
 const pool = new pg.Pool({
   user: 'your_username',
-  host: 'localhost',
-  database: 'talent_submissions',
+  host: 'your_host',
+  database: 'your_database_name',
   password: 'your_password',
   port: 5432,
 });
