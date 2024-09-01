@@ -10,12 +10,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 import SignatureCanvas from 'react-signature-canvas';
 import { submitTalent } from '@/lib/api';
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
+  const [isUnder18DialogOpen, setIsUnder18DialogOpen] = useState(false);
   const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -44,6 +52,12 @@ const TalentSubmission = () => {
     mutation.mutate(formData);
   };
 
+  const handleIsUnder18Change = (checked) => {
+    if (checked) {
+      setIsUnder18DialogOpen(true);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Submit Your Talent</h2>
@@ -63,16 +77,13 @@ const TalentSubmission = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox id="isUnder18" {...register("isUnder18")} />
+          <Checkbox 
+            id="isUnder18" 
+            {...register("isUnder18")} 
+            onCheckedChange={handleIsUnder18Change}
+          />
           <Label htmlFor="isUnder18">I am under 18 years old</Label>
         </div>
-
-        {isUnder18 && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
-            <p className="font-bold">Important Notice</p>
-            <p>As you are under 18, you must obtain a parent or guardian's signature for your submission.</p>
-          </div>
-        )}
 
         <div>
           <Label htmlFor="talentDescription">Describe Your Talent</Label>
@@ -126,6 +137,18 @@ const TalentSubmission = () => {
           {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
         </Button>
       </form>
+
+      <Dialog open={isUnder18DialogOpen} onOpenChange={setIsUnder18DialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Important Notice for Under 18 Participants</DialogTitle>
+            <DialogDescription>
+              As you are under 18, you must obtain a parent or guardian's signature for your submission. Please ensure that a parent or guardian completes the signature field on your behalf.
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => setIsUnder18DialogOpen(false)}>I Understand</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
