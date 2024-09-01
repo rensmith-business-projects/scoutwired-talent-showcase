@@ -87,8 +87,6 @@ const ViewSubmissions = () => {
   );
 };
 
-export default ViewSubmissions;
-
   if (isLoading) return <div className="text-center p-4">Loading submissions...</div>;
   if (error) return <div className="text-center p-4 text-red-500">Error loading submissions: {error.message}</div>;
 
@@ -99,8 +97,8 @@ export default ViewSubmissions;
         <Button onClick={handleLogout}>Logout</Button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {submissions.map((submission, index) => (
-          <Card key={index} className="flex flex-col">
+        {submissions.map((submission) => (
+          <Card key={submission.id} className="flex flex-col">
             <CardHeader>
               <CardTitle className="text-xl">{submission.name}</CardTitle>
             </CardHeader>
