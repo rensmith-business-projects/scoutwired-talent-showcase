@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+
+const ffmpeg = createFFmpeg({ log: true });
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -24,10 +27,15 @@ const TalentSubmission = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const [isUnder18DialogOpen, setIsUnder18DialogOpen] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
   const navigate = useNavigate();
   const signatureRef = useRef();
+
+  useEffect(() => {
+    ffmpeg.load();
+  }, []);
 
   const mutation = useMutation({
     mutationFn: submitTalent,
@@ -42,6 +50,17 @@ const TalentSubmission = () => {
       });
     },
   });
+
+  const compressVideo = async (file) => {
+    setIsCompressing(true);
+    await ffmpeg.load();
+    ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
+    await ffmpeg.run('-i', 'input.mp4', '-b:v', '1M', '-b:a', '128k', 'output.mp4');
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const compressedBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    setIsCompressing(false);
+    return new File([compressedBlob], 'compressed_video.mp4', { type: 'video/mp4' });
+  };
 
   const onSubmit = async (data) => {
     if (signatureRef.current.isEmpty()) {
@@ -67,12 +86,18 @@ const TalentSubmission = () => {
       formData.append(key, data[key]);
     }
     formData.append('signature', signatureRef.current.toDataURL());
-    formData.append('video', videoFile);
 
     try {
+      const compressedVideo = await compressVideo(videoFile);
+      formData.append('video', compressedVideo);
       await mutation.mutateAsync(formData);
     } catch (error) {
       console.error('Submission error:', error);
+      toast({
+        title: "Submission Failed",
+        description: "An error occurred while processing your video. Please try again with a smaller file.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -168,8 +193,8 @@ const TalentSubmission = () => {
           </div>
         </div>
 
-        <Button type="submit" disabled={mutation.isPending} className="w-full">
-          {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
+        <Button type="submit" disabled={mutation.isPending || isCompressing} className="w-full">
+          {mutation.isPending || isCompressing ? "Processing..." : "Submit Your Talent"}
         </Button>
       </form>
 
