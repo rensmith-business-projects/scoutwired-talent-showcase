@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSubmissions } from '@/lib/api';
+import { getSubmissions, getVideoUrl } from '@/lib/api';
 import { useMsal, useIsAuthenticated } from "@azure/msal-react";
 import { loginRequest } from '@/lib/samlAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -87,7 +87,7 @@ const ViewSubmissions = () => {
             <CardContent className="flex-grow">
               <p className="mb-2"><strong>Talent:</strong> {submission.talent_description}</p>
               <p className="mb-4"><strong>Discord:</strong> {submission.discord_username}</p>
-              <video src={submission.video_url} controls className="w-full h-48 object-cover rounded-md" />
+              <video src={getVideoUrl(submission.id)} controls className="w-full h-48 object-cover rounded-md" />
               <p className="mt-2 text-sm text-gray-500">Submitted on: {new Date(submission.created_at).toLocaleString()}</p>
             </CardContent>
           </Card>

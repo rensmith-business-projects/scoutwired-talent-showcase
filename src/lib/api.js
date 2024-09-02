@@ -4,10 +4,7 @@ export const submitTalent = async (formData) => {
   try {
     const response = await fetch(`${API_URL}/submissions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
+      body: formData, // Send formData directly
     });
     if (!response.ok) {
       const errorData = await response.json();
@@ -33,4 +30,8 @@ export const getSubmissions = async () => {
     console.error('Error fetching submissions:', error);
     throw error;
   }
+};
+
+export const getVideoUrl = (submissionId) => {
+  return `${API_URL}/video/${submissionId}`;
 };
