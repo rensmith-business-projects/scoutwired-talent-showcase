@@ -53,13 +53,27 @@ const TalentSubmission = () => {
       return;
     }
 
+    if (!videoFile) {
+      toast({
+        title: "Video Required",
+        description: "Please upload a video before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const formData = new FormData();
     for (const key in data) {
       formData.append(key, data[key]);
     }
-    formData.append('signature', signature);
+    formData.append('signature', signatureRef.current.toDataURL());
     formData.append('video', videoFile);
-    mutation.mutate(formData);
+
+    try {
+      await mutation.mutateAsync(formData);
+    } catch (error) {
+      console.error('Submission error:', error);
+    }
   };
 
   const handleIsUnder18Change = (checked) => {
@@ -154,7 +168,7 @@ const TalentSubmission = () => {
           </div>
         </div>
 
-        <Button type="submit" disabled={mutation.isPending || !videoFile} className="w-full">
+        <Button type="submit" disabled={mutation.isPending} className="w-full">
           {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
         </Button>
       </form>
