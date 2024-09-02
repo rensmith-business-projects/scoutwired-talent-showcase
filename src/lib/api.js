@@ -4,7 +4,8 @@ export const submitTalent = async (formData) => {
   try {
     const response = await fetch(`${API_URL}/submissions`, {
       method: 'POST',
-      body: formData, // Send formData directly
+      body: formData,
+      credentials: 'include', // Include credentials for CORS
     });
     if (!response.ok) {
       const errorData = await response.json();
@@ -20,15 +21,24 @@ export const submitTalent = async (formData) => {
 
 export const getSubmissions = async () => {
   try {
-    const response = await fetch(`${API_URL}/submissions`);
+    const response = await fetch(`${API_URL}/submissions`, {
+      method: 'GET',
+      credentials: 'include', // Include credentials for CORS
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
     if (!response.ok) {
+      if (response.status === 404) {
+        return []; // Return an empty array if no submissions are found
+      }
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch submissions');
+      throw new Error(errorData.error || `Failed to fetch submissions. Status: ${response.status}`);
     }
     return await response.json();
   } catch (error) {
     console.error('Error fetching submissions:', error);
-    throw error;
+    throw new Error(`Failed to fetch submissions: ${error.message}`);
   }
 };
 
