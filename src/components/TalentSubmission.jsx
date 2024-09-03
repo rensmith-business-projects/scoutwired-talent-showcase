@@ -17,9 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
-
-const ffmpeg = createFFmpeg({ log: true });
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -32,9 +31,10 @@ const TalentSubmission = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const signatureRef = useRef();
+  const ffmpegRef = useRef(new FFmpeg());
 
   useEffect(() => {
-    ffmpeg.load();
+    ffmpegRef.current.load();
   }, []);
 
   const mutation = useMutation({
@@ -53,6 +53,7 @@ const TalentSubmission = () => {
 
   const compressVideo = async (file) => {
     setIsCompressing(true);
+    const ffmpeg = ffmpegRef.current;
     await ffmpeg.load();
     ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
     await ffmpeg.run('-i', 'input.mp4', '-b:v', '1M', '-b:a', '128k', 'output.mp4');
