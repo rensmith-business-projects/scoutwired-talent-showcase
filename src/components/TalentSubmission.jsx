@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -145,7 +145,7 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="video">Upload Your Video (Max 5MB)</Label>
+          <Label htmlFor="video">Upload Your Video (Max 50MB)</Label>
           <Input id="video" type="file" accept="video/*" onChange={handleVideoUpload} required />
           {fileSizeError && <p className="text-red-500 text-sm mt-1">{fileSizeError}</p>}
           {videoPreviewUrl && (
