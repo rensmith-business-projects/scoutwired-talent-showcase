@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -78,7 +78,7 @@ const TalentSubmission = () => {
       console.error('Submission error:', error);
       toast({
         title: "Submission Failed",
-        description: "An error occurred while submitting your talent. Please try again.",
+        description: error.message || "An error occurred while submitting your talent. Please try again.",
         variant: "destructive",
       });
     }
@@ -145,7 +145,7 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="video">Upload Your Video (Max 10MB)</Label>
+          <Label htmlFor="video">Upload Your Video (Max 5MB)</Label>
           <Input id="video" type="file" accept="video/*" onChange={handleVideoUpload} required />
           {fileSizeError && <p className="text-red-500 text-sm mt-1">{fileSizeError}</p>}
           {videoPreviewUrl && (
