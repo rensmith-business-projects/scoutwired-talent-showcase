@@ -18,12 +18,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const [isUnder18DialogOpen, setIsUnder18DialogOpen] = useState(false);
+  const [fileSizeError, setFileSizeError] = useState('');
   const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -92,6 +95,22 @@ const TalentSubmission = () => {
     setSignature(null);
   };
 
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        setFileSizeError(`File size exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit. Please choose a smaller file.`);
+        setVideoFile(null);
+        setVideoPreviewUrl(null);
+      } else {
+        setFileSizeError('');
+        setVideoFile(file);
+        const videoUrl = URL.createObjectURL(file);
+        setVideoPreviewUrl(videoUrl);
+      }
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Submit Your Talent</h2>
@@ -126,15 +145,9 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="video">Upload Your Video</Label>
-          <Input id="video" type="file" accept="video/*" onChange={(e) => {
-            const file = e.target.files[0];
-            setVideoFile(file);
-            if (file) {
-              const videoUrl = URL.createObjectURL(file);
-              setVideoPreviewUrl(videoUrl);
-            }
-          }} required />
+          <Label htmlFor="video">Upload Your Video (Max 10MB)</Label>
+          <Input id="video" type="file" accept="video/*" onChange={handleVideoUpload} required />
+          {fileSizeError && <p className="text-red-500 text-sm mt-1">{fileSizeError}</p>}
           {videoPreviewUrl && (
             <div className="mt-4">
               <Label>Video Preview</Label>
