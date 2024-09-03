@@ -18,6 +18,9 @@ export const submitTalent = async (formData) => {
     } else {
       const text = await response.text();
       console.error('Received non-JSON response:', text);
+      if (response.status === 413) {
+        throw new Error('File size too large. Please upload a smaller file (max 10MB).');
+      }
       throw new Error(`Received non-JSON response. Status: ${response.status}`);
     }
   } catch (error) {
