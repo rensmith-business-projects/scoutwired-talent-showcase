@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://gottalent.scoutwired.org/api';
 
 export const submitTalent = async (formData) => {
   try {
@@ -19,7 +19,7 @@ export const submitTalent = async (formData) => {
       const text = await response.text();
       console.error('Received non-JSON response:', text);
       if (response.status === 413) {
-        throw new Error('File size too large. Please upload a smaller file (max 50MB).');
+        throw new Error('File size too large. Please upload a smaller file (max 100GB).');
       }
       throw new Error(`Received non-JSON response. Status: ${response.status}`);
     }

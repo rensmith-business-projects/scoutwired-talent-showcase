@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024; // 100GB
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -99,7 +99,7 @@ const TalentSubmission = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > MAX_FILE_SIZE) {
-        setFileSizeError(`File size exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit. Please choose a smaller file.`);
+        setFileSizeError(`File size exceeds ${MAX_FILE_SIZE / 1024 / 1024 / 1024}GB limit. Please choose a smaller file.`);
         setVideoFile(null);
         setVideoPreviewUrl(null);
       } else {
@@ -145,7 +145,7 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="video">Upload Your Video (Max 50MB)</Label>
+          <Label htmlFor="video">Upload Your Video (Max 100GB)</Label>
           <Input id="video" type="file" accept="video/*" onChange={handleVideoUpload} required />
           {fileSizeError && <p className="text-red-500 text-sm mt-1">{fileSizeError}</p>}
           {videoPreviewUrl && (
