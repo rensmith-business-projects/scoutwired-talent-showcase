@@ -14,20 +14,20 @@ export const submitTalent = async (formData) => {
       if (!response.ok) {
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
-      return { success: true, message: "Talent submitted successfully", data };
+      return { success: true, message: "Drawing submitted successfully", data };
     } else {
       const text = await response.text();
       console.error('Received non-JSON response:', text);
       if (response.status === 413) {
-        throw new Error('File size too large. The server cannot accept files larger than 100GB. Please try uploading a smaller file.');
+        throw new Error('File size too large. The server cannot accept files larger than 10MB. Please try uploading a smaller file.');
       }
       if (text.includes("413 Request Entity Too Large")) {
-        throw new Error('File size too large. The server cannot accept files larger than 100GB. Please try uploading a smaller file.');
+        throw new Error('File size too large. The server cannot accept files larger than 10MB. Please try uploading a smaller file.');
       }
       throw new Error(`Unexpected server response. Please try again later or contact support if the issue persists.`);
     }
   } catch (error) {
-    console.error('Error submitting talent:', error);
+    console.error('Error submitting drawing:', error);
     throw error;
   }
 };

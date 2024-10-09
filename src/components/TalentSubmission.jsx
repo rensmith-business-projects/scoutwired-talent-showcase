@@ -7,32 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import SignatureCanvas from 'react-signature-canvas';
 import { submitTalent } from '@/lib/api';
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from 'lucide-react';
+import Signature from './Signature';
 
-const MAX_FILE_SIZE = 100 * 1024 * 1024 * 1024; // 100GB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const TalentSubmission = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
-  const [videoFile, setVideoFile] = useState(null);
-  const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
+  const [drawingFile, setDrawingFile] = useState(null);
+  const [drawingPreviewUrl, setDrawingPreviewUrl] = useState(null);
   const [isUnder18DialogOpen, setIsUnder18DialogOpen] = useState(false);
   const [fileSizeError, setFileSizeError] = useState('');
   const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
   const navigate = useNavigate();
-  const signatureRef = useRef();
 
   const mutation = useMutation({
     mutationFn: submitTalent,
@@ -49,7 +42,7 @@ const TalentSubmission = () => {
   });
 
   const onSubmit = async (data) => {
-    if (signatureRef.current.isEmpty()) {
+    if (!signature) {
       toast({
         title: "Signature Required",
         description: "Please provide your signature before submitting.",
@@ -58,17 +51,12 @@ const TalentSubmission = () => {
       return;
     }
 
-    if (!videoFile) {
+    if (!drawingFile) {
       toast({
-        title: "Video Required",
-        description: "Please upload a video before submitting.",
+        title: "Drawing Required",
+        description: "Please upload a drawing before submitting.",
         variant: "destructive",
       });
-      return;
-    }
-
-    if (videoFile.size > MAX_FILE_SIZE) {
-      setFileSizeError(`File size exceeds 100GB limit. Please choose a smaller file.`);
       return;
     }
 
@@ -76,8 +64,8 @@ const TalentSubmission = () => {
     for (const key in data) {
       formData.append(key, data[key]);
     }
-    formData.append('signature', signatureRef.current.toDataURL());
-    formData.append('video', videoFile);
+    formData.append('signature', signature);
+    formData.append('drawing', drawingFile);
 
     try {
       await mutation.mutateAsync(formData);
@@ -97,35 +85,30 @@ const TalentSubmission = () => {
     }
   };
 
-  const clearSignature = () => {
-    signatureRef.current.clear();
-    setSignature(null);
-  };
-
-  const handleVideoUpload = (e) => {
+  const handleDrawingUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > MAX_FILE_SIZE) {
-        setFileSizeError(`File size exceeds 100GB limit. Please choose a smaller file.`);
-        setVideoFile(null);
-        setVideoPreviewUrl(null);
+        setFileSizeError(`File size exceeds 10MB limit. Please choose a smaller file.`);
+        setDrawingFile(null);
+        setDrawingPreviewUrl(null);
       } else {
         setFileSizeError('');
-        setVideoFile(file);
-        const videoUrl = URL.createObjectURL(file);
-        setVideoPreviewUrl(videoUrl);
+        setDrawingFile(file);
+        const drawingUrl = URL.createObjectURL(file);
+        setDrawingPreviewUrl(drawingUrl);
       }
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Submit Your Talent</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Submit Your Drawing</h2>
       <Alert className="mb-6">
         <InfoIcon className="h-4 w-4" />
         <AlertTitle>File Size Limit</AlertTitle>
         <AlertDescription>
-          Please note that the maximum allowed file size is 100GB. Larger files will be rejected.
+          Please note that the maximum allowed file size is 10MB. Larger files will be rejected.
         </AlertDescription>
       </Alert>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -141,7 +124,6 @@ const TalentSubmission = () => {
             <Input id="discordUsername" {...register("discordUsername", { required: "Discord Username is required" })} />
             {errors.discordUsername && <p className="text-red-500 text-sm mt-1">{errors.discordUsername.message}</p>}
           </div>
-        </div>
 
         <div className="flex items-center space-x-2">
           <Checkbox 
@@ -153,19 +135,19 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="talentDescription">Describe Your Talent</Label>
-          <Textarea id="talentDescription" {...register("talentDescription", { required: "Description is required" })} className="h-32" />
-          {errors.talentDescription && <p className="text-red-500 text-sm mt-1">{errors.talentDescription.message}</p>}
+          <Label htmlFor="drawingDescription">Describe Your Drawing</Label>
+          <Textarea id="drawingDescription" {...register("drawingDescription", { required: "Description is required" })} className="h-32" />
+          {errors.drawingDescription && <p className="text-red-500 text-sm mt-1">{errors.drawingDescription.message}</p>}
         </div>
 
         <div>
-          <Label htmlFor="video">Upload Your Video (Max 100GB)</Label>
-          <Input id="video" type="file" accept="video/*" onChange={handleVideoUpload} required />
+          <Label htmlFor="drawing">Upload Your Drawing (Max 10MB)</Label>
+          <Input id="drawing" type="file" accept="image/*" onChange={handleDrawingUpload} required />
           {fileSizeError && <p className="text-red-500 text-sm mt-1">{fileSizeError}</p>}
-          {videoPreviewUrl && (
+          {drawingPreviewUrl && (
             <div className="mt-4">
-              <Label>Video Preview</Label>
-              <video src={videoPreviewUrl} controls className="w-full mt-2 max-h-64 object-contain" />
+              <Label>Drawing Preview</Label>
+              <img src={drawingPreviewUrl} alt="Drawing preview" className="w-full mt-2 max-h-64 object-contain" />
             </div>
           )}
         </div>
@@ -185,23 +167,11 @@ const TalentSubmission = () => {
             </ol>
           </div>
         </div>
-        <div>
-          <Label>{isUnder18 ? "Parent/Guardian E-Signature" : "E-Signature"}</Label>
-          <div className="border border-gray-300 rounded-md p-2">
-            <SignatureCanvas 
-              ref={signatureRef}
-              penColor='black'
-              canvasProps={{width: '100%', height: 200, className: 'signature-canvas'}}
-              onEnd={() => setSignature(signatureRef.current.toDataURL())}
-            />
-          </div>
-          <div className="mt-2">
-            <Button type="button" onClick={clearSignature} variant="outline">Clear Signature</Button>
-          </div>
-        </div>
+
+        <Signature isUnder18={isUnder18} onSignatureChange={setSignature} />
 
         <Button type="submit" disabled={mutation.isPending} className="w-full">
-          {mutation.isPending ? "Submitting..." : "Submit Your Talent"}
+          {mutation.isPending ? "Submitting..." : "Submit Your Drawing"}
         </Button>
       </form>
 
