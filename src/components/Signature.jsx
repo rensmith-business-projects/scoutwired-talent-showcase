@@ -3,7 +3,7 @@ import SignatureCanvas from 'react-signature-canvas';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-const Signature = ({ isUnder18, onSignatureChange }) => {
+const Signature = ({ onSignatureChange }) => {
   const signatureRef = useRef();
 
   const clearSignature = () => {
@@ -13,7 +13,7 @@ const Signature = ({ isUnder18, onSignatureChange }) => {
 
   return (
     <div>
-      <Label>{isUnder18 ? "Parent/Guardian E-Signature" : "E-Signature"}</Label>
+      <Label>E-Signature</Label>
       <div className="border border-gray-300 rounded-md p-2">
         <SignatureCanvas 
           ref={signatureRef}

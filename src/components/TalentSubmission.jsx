@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { submitTalent } from '@/lib/api';
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from 'lucide-react';
 import Signature from './Signature';
@@ -17,13 +15,11 @@ import Signature from './Signature';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const TalentSubmission = () => {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
   const [drawingFile, setDrawingFile] = useState(null);
   const [drawingPreviewUrl, setDrawingPreviewUrl] = useState(null);
-  const [isUnder18DialogOpen, setIsUnder18DialogOpen] = useState(false);
   const [fileSizeError, setFileSizeError] = useState('');
-  const isUnder18 = watch("isUnder18");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -73,15 +69,9 @@ const TalentSubmission = () => {
       console.error('Submission error:', error);
       toast({
         title: "Submission Failed",
-        description: error.message || "An error occurred while submitting your talent. Please try again.",
+        description: error.message || "An error occurred while submitting your drawing. Please try again.",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleIsUnder18Change = (checked) => {
-    if (checked) {
-      setIsUnder18DialogOpen(true);
     }
   };
 
@@ -126,15 +116,6 @@ const TalentSubmission = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="isUnder18" 
-            {...register("isUnder18")} 
-            onCheckedChange={handleIsUnder18Change}
-          />
-          <Label htmlFor="isUnder18">I am under 18 years old</Label>
-        </div>
-
         <div>
           <Label htmlFor="drawingDescription">Describe Your Drawing</Label>
           <Textarea id="drawingDescription" {...register("drawingDescription", { required: "Description is required" })} className="h-32" />
@@ -162,31 +143,16 @@ const TalentSubmission = () => {
               <li>I confirm that I have all necessary rights to the drawing I'm submitting.</li>
               <li>I understand that my personal information will be handled in accordance with ScoutWired's privacy policy.</li>
               <li>I agree to abide by ScoutWired's terms of service and community guidelines.</li>
-              {isUnder18 && (
-                <li>As the parent/guardian of the participant, I give permission for their participation and agree to the terms on their behalf.</li>
-              )}
             </ol>
           </div>
         </div>
 
-        <Signature isUnder18={isUnder18} onSignatureChange={setSignature} />
+        <Signature onSignatureChange={setSignature} />
 
         <Button type="submit" disabled={mutation.isPending} className="w-full">
           {mutation.isPending ? "Submitting..." : "Submit Your Drawing"}
         </Button>
       </form>
-
-      <Dialog open={isUnder18DialogOpen} onOpenChange={setIsUnder18DialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Important Notice for Under 18 Participants</DialogTitle>
-            <DialogDescription>
-              As you are under 18, you must obtain a parent or guardian's signature for your submission. Please ensure that a parent or guardian completes the signature field on your behalf.
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={() => setIsUnder18DialogOpen(false)}>I Understand</Button>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
