@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -124,6 +124,7 @@ const TalentSubmission = () => {
             <Input id="discordUsername" {...register("discordUsername", { required: "Discord Username is required" })} />
             {errors.discordUsername && <p className="text-red-500 text-sm mt-1">{errors.discordUsername.message}</p>}
           </div>
+        </div>
 
         <div className="flex items-center space-x-2">
           <Checkbox 
@@ -157,8 +158,8 @@ const TalentSubmission = () => {
           <div className="bg-gray-100 p-4 rounded-md text-sm mb-4">
             <p>By signing below, I acknowledge and agree to the following:</p>
             <ol className="list-decimal pl-5 mt-2 space-y-2">
-              <li>I grant ScoutWired the right to use my submitted content for promotional purposes.</li>
-              <li>I confirm that I have all necessary rights to the content I'm submitting.</li>
+              <li>I grant ScoutWired the right to use my submitted drawing for promotional purposes.</li>
+              <li>I confirm that I have all necessary rights to the drawing I'm submitting.</li>
               <li>I understand that my personal information will be handled in accordance with ScoutWired's privacy policy.</li>
               <li>I agree to abide by ScoutWired's terms of service and community guidelines.</li>
               {isUnder18 && (
