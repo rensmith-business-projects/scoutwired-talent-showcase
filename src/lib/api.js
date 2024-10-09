@@ -43,6 +43,6 @@ export const getSubmissions = async () => {
   }
 };
 
-export const getDrawingUrl = (submissionId) => {
-  return `${API_URL}/get-drawing/${submissionId}`;
+export const getFileUrl = (submissionId) => {
+  return `${API_URL}/get-file/${submissionId}`;
 };

@@ -17,8 +17,8 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const TalentSubmission = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [signature, setSignature] = useState(null);
-  const [drawingFile, setDrawingFile] = useState(null);
-  const [drawingPreviewUrl, setDrawingPreviewUrl] = useState(null);
+  const [file, setFile] = useState(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState(null);
   const [fileSizeError, setFileSizeError] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -47,10 +47,10 @@ const TalentSubmission = () => {
       return;
     }
 
-    if (!drawingFile) {
+    if (!file) {
       toast({
-        title: "Drawing Required",
-        description: "Please upload a drawing before submitting.",
+        title: "File Required",
+        description: "Please upload a PDF or image file before submitting.",
         variant: "destructive",
       });
       return;
@@ -61,7 +61,7 @@ const TalentSubmission = () => {
       formData.append(key, data[key]);
     }
     formData.append('signature', signature);
-    formData.append('drawing', drawingFile);
+    formData.append('file', file);
 
     try {
       await mutation.mutateAsync(formData);
@@ -69,24 +69,28 @@ const TalentSubmission = () => {
       console.error('Submission error:', error);
       toast({
         title: "Submission Failed",
-        description: error.message || "An error occurred while submitting your drawing. Please try again.",
+        description: error.message || "An error occurred while submitting your file. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const handleDrawingUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > MAX_FILE_SIZE) {
+  const handleFileUpload = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      if (selectedFile.size > MAX_FILE_SIZE) {
         setFileSizeError(`File size exceeds 10MB limit. Please choose a smaller file.`);
-        setDrawingFile(null);
-        setDrawingPreviewUrl(null);
+        setFile(null);
+        setFilePreviewUrl(null);
       } else {
         setFileSizeError('');
-        setDrawingFile(file);
-        const drawingUrl = URL.createObjectURL(file);
-        setDrawingPreviewUrl(drawingUrl);
+        setFile(selectedFile);
+        if (selectedFile.type.startsWith('image/')) {
+          const fileUrl = URL.createObjectURL(selectedFile);
+          setFilePreviewUrl(fileUrl);
+        } else {
+          setFilePreviewUrl(null);
+        }
       }
     }
   };
@@ -123,13 +127,13 @@ const TalentSubmission = () => {
         </div>
 
         <div>
-          <Label htmlFor="drawing">Upload Your Drawing (Max 10MB)</Label>
-          <Input id="drawing" type="file" accept="image/*" onChange={handleDrawingUpload} required />
+          <Label htmlFor="file">Upload Your Drawing (PDF or Image, Max 10MB)</Label>
+          <Input id="file" type="file" accept=".pdf,image/*" onChange={handleFileUpload} required />
           {fileSizeError && <p className="text-red-500 text-sm mt-1">{fileSizeError}</p>}
-          {drawingPreviewUrl && (
+          {filePreviewUrl && (
             <div className="mt-4">
-              <Label>Drawing Preview</Label>
-              <img src={drawingPreviewUrl} alt="Drawing preview" className="w-full mt-2 max-h-64 object-contain" />
+              <Label>File Preview</Label>
+              <img src={filePreviewUrl} alt="File preview" className="w-full mt-2 max-h-64 object-contain" />
             </div>
           )}
         </div>

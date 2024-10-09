@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
 import multer from 'multer';
-import { BlobServiceClient } from '@azure/storage-blob';
 import { ClientSecretCredential } from '@azure/identity';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { TokenCredentialAuthenticationProvider } from '@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials/index.js';
@@ -11,8 +10,8 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json({ limit: '100gb' }));
-app.use(express.urlencoded({ limit: '100gb', extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -36,36 +35,41 @@ const graphClient = Client.initWithMiddleware({ authProvider });
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 100 * 1024 * 1024 * 1024 } // 100GB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images and PDF files are allowed!'), false);
+    }
+  }
 });
 
-// New route to handle submission creation
-app.post('/api/create-submission', upload.single('drawing'), async (req, res) => {
+app.post('/api/create-submission', upload.single('file'), async (req, res) => {
   const { name, drawingDescription, discordUsername } = req.body;
-  const drawingFile = req.file;
+  const file = req.file;
 
   try {
-    const fileName = `${Date.now()}_${drawingFile.originalname}`;
-    const fileContent = drawingFile.buffer;
+    const fileName = `${Date.now()}_${file.originalname}`;
+    const fileContent = file.buffer;
 
     const uploadedFile = await graphClient.api(`/sites/${siteId}/drives/${driveId}/root:/${fileName}:/content`)
       .put(fileContent);
 
-    const drawingUrl = uploadedFile.webUrl;
+    const fileUrl = uploadedFile.webUrl;
 
     const result = await pool.query(
-      'INSERT INTO submissions (name, talent_description, discord_username, video_url) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, drawingDescription, discordUsername, drawingUrl]
+      'INSERT INTO submissions (name, talent_description, discord_username, file_url) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, drawingDescription, discordUsername, fileUrl]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'An error occurred while submitting the drawing' });
+    res.status(500).json({ error: 'An error occurred while submitting the file' });
   }
 });
 
-// New route to handle fetching submissions
 app.get('/api/get-submissions', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM submissions ORDER BY id DESC');
@@ -76,28 +80,27 @@ app.get('/api/get-submissions', async (req, res) => {
   }
 });
 
-// New route to handle fetching a single drawing
-app.get('/api/get-drawing/:submissionId', async (req, res) => {
+app.get('/api/get-file/:submissionId', async (req, res) => {
   const { submissionId } = req.params;
 
   try {
-    const result = await pool.query('SELECT video_url FROM submissions WHERE id = $1', [submissionId]);
+    const result = await pool.query('SELECT file_url FROM submissions WHERE id = $1', [submissionId]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Submission not found' });
     }
 
-    const { video_url } = result.rows[0];
+    const { file_url } = result.rows[0];
 
-    const fileContent = await graphClient.api(video_url).get();
+    const fileContent = await graphClient.api(file_url).get();
 
-    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Content-Type', fileContent.contentType);
     res.setHeader('Content-Disposition', 'inline');
 
     fileContent.pipe(res);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'An error occurred while fetching the drawing' });
+    res.status(500).json({ error: 'An error occurred while fetching the file' });
   }
 });
 
@@ -112,7 +115,7 @@ pool.query(`
     name VARCHAR(255) NOT NULL,
     talent_description TEXT NOT NULL,
     discord_username VARCHAR(255) NOT NULL,
-    video_url TEXT NOT NULL,
+    file_url TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )
 `).catch(err => console.error('Error creating table:', err));
