@@ -14,7 +14,11 @@ This project consists of a React frontend and an Express backend for showcasing 
 3. Create a `.env` file in the root directory and add:
    ```
    VITE_API_URL=http://localhost:3001
+   VITE_AZURE_CLIENT_ID=your_azure_client_id
+   VITE_AZURE_TENANT_ID=your_azure_tenant_id
+   VITE_REDIRECT_URI=http://localhost:5173/auth-redirect
    ```
+   Replace `your_azure_client_id` and `your_azure_tenant_id` with your actual Azure AD application (client) ID and tenant ID.
 4. Start the development server:
    ```
    npm run dev
@@ -78,6 +82,9 @@ The frontend will be available at `http://localhost:5173` and will communicate w
 
 ### Frontend (.env in project root)
 - `VITE_API_URL`: URL of the backend API (e.g., http://localhost:3001)
+- `VITE_AZURE_CLIENT_ID`: Your Azure AD application (client) ID
+- `VITE_AZURE_TENANT_ID`: Your Azure AD tenant ID
+- `VITE_REDIRECT_URI`: The redirect URI for authentication (e.g., http://localhost:5173/auth-redirect)
 
 ### Backend (.env in server directory)
 - `PORT`: Port for the backend server (default 3001)

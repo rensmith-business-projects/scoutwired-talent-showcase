@@ -2,9 +2,9 @@ import { PublicClientApplication } from "@azure/msal-browser";
 
 export const msalConfig = {
   auth: {
-    clientId: "YOUR_CLIENT_ID",
-    authority: "https://login.microsoftonline.com/YOUR_TENANT_ID",
-    redirectUri: "http://localhost:5173/auth-redirect",
+    clientId: process.env.VITE_AZURE_CLIENT_ID,
+    authority: `https://login.microsoftonline.com/${process.env.VITE_AZURE_TENANT_ID}`,
+    redirectUri: process.env.VITE_REDIRECT_URI || "http://localhost:5173/auth-redirect",
   },
   cache: {
     cacheLocation: "sessionStorage",
@@ -13,7 +13,7 @@ export const msalConfig = {
 };
 
 export const loginRequest = {
-  scopes: ["user.read"]
+  scopes: ["User.Read"]
 };
 
 export const msalInstance = new PublicClientApplication(msalConfig);
