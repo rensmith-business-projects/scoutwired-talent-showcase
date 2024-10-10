@@ -1,72 +1,83 @@
-# Welcome to your GPT Engineer project
+# ScoutWired Talent Showcase
 
-## Project info
+This project consists of a React frontend and an Express backend for showcasing talent submissions.
 
-**Project**: scoutwired-talent-showcase
+## Setting Up the Project
 
-**URL**: https://run.gptengineer.app/projects/a3a00385-1d0d-470d-9731-8169bd152cb7/improve
+### Frontend Setup
 
-## How can I edit this code?
+1. Navigate to the project root directory.
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Create a `.env` file in the root directory and add:
+   ```
+   VITE_API_URL=http://localhost:3001
+   ```
+4. Start the development server:
+   ```
+   npm run dev
+   ```
 
-There are several ways of editing your application.
+### Backend Setup
 
-**Use GPT Engineer**
+1. Navigate to the project root directory.
+2. Create a `server` folder:
+   ```
+   mkdir server
+   cd server
+   ```
+3. Initialize a new Node.js project:
+   ```
+   npm init -y
+   ```
+4. Install required dependencies:
+   ```
+   npm install express cors pg multer @azure/identity @microsoft/microsoft-graph-client dotenv
+   ```
+5. Create a `.env` file in the `server` directory and add the following (replace with your actual values):
+   ```
+   PORT=3001
+   DATABASE_URL=your_postgres_database_url
+   TENANT_ID=your_azure_tenant_id
+   CLIENT_ID=your_azure_client_id
+   CLIENT_SECRET=your_azure_client_secret
+   SHAREPOINT_SITE_ID=your_sharepoint_site_id
+   SHAREPOINT_DRIVE_ID=your_sharepoint_drive_id
+   ```
+6. Create a `server.js` file in the `server` directory and copy the contents from the existing `server.js` file in the project root.
+7. Start the server:
+   ```
+   node server.js
+   ```
 
-Simply visit the GPT Engineer project at [GPT Engineer](https://run.gptengineer.app/projects/a3a00385-1d0d-470d-9731-8169bd152cb7/improve) and start prompting.
+## Running the Application
 
-Changes made via gptengineer.app will be committed automatically to this repo.
+1. Start the backend server:
+   ```
+   cd server
+   node server.js
+   ```
+2. In a new terminal, start the frontend development server:
+   ```
+   npm run dev
+   ```
 
-**Use your preferred IDE**
+The frontend will be available at `http://localhost:5173` and will communicate with the backend at `http://localhost:3001`.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in the GPT Engineer UI.
+## Environment Variables
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Frontend (.env in project root)
+- `VITE_API_URL`: URL of the backend API (e.g., http://localhost:3001)
 
-Follow these steps:
+### Backend (.env in server directory)
+- `PORT`: Port for the backend server (default 3001)
+- `DATABASE_URL`: PostgreSQL database connection string
+- `TENANT_ID`: Azure AD tenant ID
+- `CLIENT_ID`: Azure AD client ID
+- `CLIENT_SECRET`: Azure AD client secret
+- `SHAREPOINT_SITE_ID`: SharePoint site ID
+- `SHAREPOINT_DRIVE_ID`: SharePoint drive ID
 
-```sh
-git clone https://github.com/GPT-Engineer-App/scoutwired-talent-showcase.git
-cd scoutwired-talent-showcase
-npm i
-
-# This will run a dev server with auto reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-All GPT Engineer projects can be deployed directly via the GPT Engineer app.
-
-Simply visit your project at [GPT Engineer](https://run.gptengineer.app/projects/a3a00385-1d0d-470d-9731-8169bd152cb7/improve) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain, then we recommend GitHub Pages.
-
-To use GitHub Pages you will need to follow these steps:
-
-- Deploy your project using GitHub Pages - instructions [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site#creating-your-site)
-- Configure a custom domain for your GitHub Pages site - instructions [here](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
+Ensure all environment variables are properly set before running the application.
