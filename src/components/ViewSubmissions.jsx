@@ -39,6 +39,10 @@ const ViewSubmissions = () => {
     queryKey: ['submissions'],
     queryFn: getSubmissions,
     enabled: isAuthenticated,
+    retry: 3,
+    onError: (error) => {
+      console.error('Error fetching submissions:', error);
+    },
   });
 
   const handleLogout = async () => {
@@ -78,21 +82,25 @@ const ViewSubmissions = () => {
         <h1 className="text-2xl sm:text-3xl font-bold">Talent Submissions</h1>
         <Button onClick={handleLogout}>Logout</Button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {submissions && submissions.map((submission) => (
-          <Card key={submission.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-xl">{submission.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="mb-2"><strong>Talent:</strong> {submission.talent_description}</p>
-              <p className="mb-4"><strong>Discord:</strong> {submission.discord_username}</p>
-              <img src={getFileUrl(submission.id)} alt={`Submission by ${submission.name}`} className="w-full h-48 object-cover rounded-md" />
-              <p className="mt-2 text-sm text-gray-500">Submitted on: {new Date(submission.created_at).toLocaleString()}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {submissions && submissions.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {submissions.map((submission) => (
+            <Card key={submission.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-xl">{submission.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="mb-2"><strong>Talent:</strong> {submission.talent_description}</p>
+                <p className="mb-4"><strong>Discord:</strong> {submission.discord_username}</p>
+                <img src={getFileUrl(submission.id)} alt={`Submission by ${submission.name}`} className="w-full h-48 object-cover rounded-md" />
+                <p className="mt-2 text-sm text-gray-500">Submitted on: {new Date(submission.created_at).toLocaleString()}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center">No submissions found.</p>
+      )}
     </div>
   );
 };

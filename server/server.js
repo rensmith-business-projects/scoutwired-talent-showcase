@@ -94,6 +94,7 @@ app.get('/api/get-submissions', async (req, res) => {
   try {
     console.log('Fetching submissions from database...');
     const result = await pool.query('SELECT * FROM submissions ORDER BY id DESC');
+    console.log('Submissions fetched successfully:', result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error('Error in get-submissions:', err);
