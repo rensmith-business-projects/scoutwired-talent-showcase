@@ -36,7 +36,7 @@ This project consists of a React frontend and an Express backend for showcasing 
    ```
    npm install express cors pg multer @azure/identity @microsoft/microsoft-graph-client dotenv
    ```
-5. Create a `.env` file in the `server` directory and add the following (replace with your actual values):
+5. Create a `.env` file in the `server` directory and add the following:
    ```
    PORT=3001
    DATABASE_URL=your_postgres_database_url
@@ -46,6 +46,14 @@ This project consists of a React frontend and an Express backend for showcasing 
    SHAREPOINT_SITE_ID=your_sharepoint_site_id
    SHAREPOINT_DRIVE_ID=your_sharepoint_drive_id
    ```
+   Replace the placeholder values with your actual configuration:
+   - `DATABASE_URL`: Your PostgreSQL connection string (e.g., `postgresql://username:password@localhost:5432/database_name`)
+   - `TENANT_ID`: Your Azure AD tenant ID
+   - `CLIENT_ID`: Your Azure AD application (client) ID
+   - `CLIENT_SECRET`: Your Azure AD client secret
+   - `SHAREPOINT_SITE_ID`: The ID of your SharePoint site
+   - `SHAREPOINT_DRIVE_ID`: The ID of the SharePoint drive where files will be stored
+
 6. Create a `server.js` file in the `server` directory and copy the contents from the existing `server.js` file in the project root.
 7. Start the server:
    ```
@@ -80,4 +88,4 @@ The frontend will be available at `http://localhost:5173` and will communicate w
 - `SHAREPOINT_SITE_ID`: SharePoint site ID
 - `SHAREPOINT_DRIVE_ID`: SharePoint drive ID
 
-Ensure all environment variables are properly set before running the application.
+Ensure all environment variables are properly set before running the application. Do not commit your `.env` files to version control to keep your sensitive information secure.
