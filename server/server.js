@@ -19,7 +19,9 @@ app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: {
+    rejectUnauthorized: false, // This allows self-signed certificates
+  }
 });
 
 // Check for required environment variables
